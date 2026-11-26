@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+  font-family: system-ui, sans-serif;
+}
+#text {
+  font-size: 24px;
+  font-weight: 600;
+  background: linear-gradient(90deg, var(--color1), var(--color2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+</style>
+</head>
+<body>
+<div id="text">Maddie's Playtime</div>
+<script>
+const colors = location.hash.split('/').filter(Boolean);
+const color1 = colors[0] || '#FFFFFF';
+const color2 = colors[1] || color1;
+document.documentElement.style.setProperty('--color1', color1);
+document.documentElement.style.setProperty('--color2', color2);
+</script>
+</body>
+</html>
