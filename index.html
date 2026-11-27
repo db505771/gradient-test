@@ -6,13 +6,9 @@
   <title>Playtime Tracker</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    :root {
-      --color1: #FFFFFF;
-      --color2: #FFFFFF;
-    }
     body {
       background: transparent;
-      color: var(--color1);
+      color: white;
       font-family: 'Segoe UI', sans-serif;
       margin: 0;
       padding: 0;
@@ -73,15 +69,14 @@
     </div>
   </div>
   <script>
+    // URL COLORS
     const colors = location.hash.split('/').filter(Boolean);
-    const color1 = /^#[0-9A-F]{6}$/i.test(colors[0] || '')
-      ? colors[0] : '#FFFFFF';
-    const color2 = /^#[0-9A-F]{6}$/i.test(colors[1] || '')
-      ? colors[1] : color1;
+    const color1 = /^#[0-9A-F]{6}$/i.test(colors[0] || '') ? colors[0] : '#FFFFFF';
+    const color2 = /^#[0-9A-F]{6}$/i.test(colors[1] || '') ? colors[1] : color1;
     document.documentElement.style.setProperty('--color1', color1);
     document.documentElement.style.setProperty('--color2', color2);
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRo-SarpignS39lDSaIGsV13WyUJOURcyVaRP_mEqY6XfBxby9WA_XCf5AhXi8OcwHDiP4FLqBwMGKw/pub?output=csv";
-    let chartMode = 0;
+    let chartMode = 0; // 0 = total, 1 = monthly, 2 = weekly
     let chart;
     function formatTime(mins) {
       const h = Math.floor(mins / 60);
@@ -126,13 +121,9 @@
           }
         }
         const last7 = getLast7Days();
-        labels = last7.map(d =>
-          d.toLocaleDateString("default", { month: "short", day: "numeric" })
-        );
+        labels = last7.map(d => d.toLocaleDateString("default", { month: "short", day: "numeric" }));
         const dateMap = {};
-        last7.forEach(d =>
-          dateMap[d.toISOString().slice(0, 10)] = 0
-        );
+        last7.forEach(d => dateMap[d.toISOString().slice(0, 10)] = 0);
         for (const row of rows) {
           const date = new Date(row[0]);
           const key = date.toISOString().slice(0, 10);
@@ -141,21 +132,18 @@
             dateMap[key] += mins;
           }
         }
-        data = last7.map(d =>
-          dateMap[d.toISOString().slice(0, 10)] || 0
-        );
+        data = last7.map(d => dateMap[d.toISOString().slice(0, 10)] || 0);
         document.getElementById("chart-title").textContent = "Total Time";
       } else if (chartMode === 1) {
         labels = getMonthLabelsUpToCurrent();
         const monthMap = {};
-        for (let i = 0; i < labels.length; i++) {
-          monthMap[i] = 0;
-        }
+        for (let i = 0; i < labels.length; i++) monthMap[i] = 0;
         for (const row of rows) {
           const date = new Date(row[0]);
           const mins = parseInt(row[4]);
           if (!isNaN(mins) && date.getFullYear() === now.getFullYear()) {
-            monthMap[date.getMonth()] += mins;
+            const m = date.getMonth();
+            monthMap[m] += mins;
           }
         }
         data = Object.values(monthMap);
@@ -170,13 +158,9 @@
         document.getElementById("chart-title").textContent = "Monthly Playtime";
       } else if (chartMode === 2) {
         const last7 = getLast7Days();
-        labels = last7.map(d =>
-          d.toLocaleDateString("default", { month: "short", day: "numeric" })
-        );
+        labels = last7.map(d => d.toLocaleDateString("default", { month: "short", day: "numeric" }));
         const dateMap = {};
-        last7.forEach(d =>
-          dateMap[d.toISOString().slice(0, 10)] = 0
-        );
+        last7.forEach(d => dateMap[d.toISOString().slice(0, 10)] = 0);
         for (const row of rows) {
           const date = new Date(row[0]);
           const key = date.toISOString().slice(0, 10);
@@ -185,14 +169,11 @@
             dateMap[key] += mins;
           }
         }
-        data = last7.map(d =>
-          dateMap[d.toISOString().slice(0, 10)] || 0
-        );
+        data = last7.map(d => dateMap[d.toISOString().slice(0, 10)] || 0);
         totalMinutesForText = data.reduce((a, b) => a + b, 0);
         document.getElementById("chart-title").textContent = "Weekly Time";
       }
-      document.getElementById("total-time").textContent =
-        formatTime(totalMinutesForText);
+      document.getElementById("total-time").textContent = formatTime(totalMinutesForText);
       const ctx = document.getElementById("chart").getContext("2d");
       if (chart) chart.destroy();
       const gradient = ctx.createLinearGradient(0, 0, 0, 200);
@@ -212,43 +193,27 @@
             fill: true,
             tension: 0.4,
             pointRadius: 3,
-            borderWidth: 1.5
+            borderWidth: 1.5,
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: {
-              display: false
-            }
+            legend: { display: false }
           },
           layout: {
-            padding: {
-              top: 10,
-              bottom: 10
-            }
+            padding: { top: 10, bottom: 10 }
           },
           scales: {
             x: {
-              ticks: {
-                color: color1,
-                font: {
-                  size: 10
-                }
-              },
-              grid: {
-                display: false
-              }
+              ticks: { color: color1, font: { size: 10 } },
+              grid: { display: false }
             },
             y: {
               display: false,
-              ticks: {
-                display: false
-              },
-              grid: {
-                display: false
-              }
+              ticks: { display: false },
+              grid: { display: false }
             }
           }
         }
