@@ -194,7 +194,7 @@
         formatTime(totalMinutesForText);
       const ctx = document.getElementById("chart").getContext("2d");
       if (chart) chart.destroy();
-      // EXACT TWO-COLOR GRAPH GRADIENT
+      // FULLY OPAQUE GRAPH GRADIENT
       const gradient = ctx.createLinearGradient(0, 0, 0, 200);
       gradient.addColorStop(0, color1);
       gradient.addColorStop(1, color2);
