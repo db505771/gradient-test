@@ -11,7 +11,7 @@
       --color2: #FFFFFF;
     }
     body {
-      background-color: transparent;
+      background: transparent;
       color: var(--color1);
       font-family: 'Segoe UI', sans-serif;
       margin: 0;
@@ -24,9 +24,9 @@
       min-height: 100vh;
     }
     .wrapper {
-      background-color: transparent;
+      background: transparent;
       border: 1px solid rgba(255, 255, 255, 0.05);
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+      box-shadow: none;
       border-radius: 16px;
       padding: 20px;
       width: 95%;
@@ -42,7 +42,6 @@
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
-      display: inline-block;
     }
     .totals p {
       margin-top: 6px;
@@ -51,7 +50,6 @@
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
-      display: inline-block;
     }
     #chart-container {
       width: 100%;
@@ -75,28 +73,22 @@
   <script>
     // URL COLORS
     const colors = location.hash.split('/').filter(Boolean);
-    const color1 = /^#[0-9A-Fa-f]{6}$/.test(colors[0] || '')
+    const color1 = /^#[0-9A-F]{6}$/i.test(colors[0] || '')
       ? colors[0] : '#FFFFFF';
-    const color2 = /^#[0-9A-Fa-f]{6}$/.test(colors[1] || '')
+    const color2 = /^#[0-9A-F]{6}$/i.test(colors[1] || '')
       ? colors[1] : color1;
     document.documentElement.style.setProperty('--color1', color1);
     document.documentElement.style.setProperty('--color2', color2);
-    // RGB CONVERSION
-    function hexToRgb(hex) {
-      const value = hex.replace('#', '');
-      return {
-        r: parseInt(value.substring(0, 2), 16),
-        g: parseInt(value.substring(2, 4), 16),
-        b: parseInt(value.substring(4, 6), 16)
-      };
-    }
-    const rgb1 = hexToRgb(color1);
-    const rgb2 = hexToRgb(color2);
-    const gradientColor = `linear-gradient(90deg, ${color1}, ${color2})`;
-    // SPREADSHEET
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRo-SarpignS39lDSaIGsV13WyUJOURcyVaRP_mEqY6XfBxby9WA_XCf5AhXi8OcwHDiP4FLqBwMGKw/pub?output=csv";
     let chartMode = 0;
     let chart;
+    function hexToRGB(hex) {
+      return {
+        r: parseInt(hex.slice(1, 3), 16),
+        g: parseInt(hex.slice(3, 5), 16),
+        b: parseInt(hex.slice(5, 7), 16)
+      };
+    }
     function formatTime(mins) {
       const h = Math.floor(mins / 60);
       const m = mins % 60;
@@ -144,9 +136,9 @@
           d.toLocaleDateString("default", { month: "short", day: "numeric" })
         );
         const dateMap = {};
-        last7.forEach(d => {
-          dateMap[d.toISOString().slice(0, 10)] = 0;
-        });
+        last7.forEach(d =>
+          dateMap[d.toISOString().slice(0, 10)] = 0
+        );
         for (const row of rows) {
           const date = new Date(row[0]);
           const key = date.toISOString().slice(0, 10);
@@ -177,11 +169,7 @@
         for (const row of rows) {
           const d = new Date(row[0]);
           const mins = parseInt(row[4]);
-          if (
-            !isNaN(mins) &&
-            d.getFullYear() === now.getFullYear() &&
-            d.getMonth() === now.getMonth()
-          ) {
+          if (!isNaN(mins) && d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()) {
             totalMinutesForText += mins;
           }
         }
@@ -192,9 +180,9 @@
           d.toLocaleDateString("default", { month: "short", day: "numeric" })
         );
         const dateMap = {};
-        last7.forEach(d => {
-          dateMap[d.toISOString().slice(0, 10)] = 0;
-        });
+        last7.forEach(d =>
+          dateMap[d.toISOString().slice(0, 10)] = 0
+        );
         for (const row of rows) {
           const date = new Date(row[0]);
           const key = date.toISOString().slice(0, 10);
@@ -211,16 +199,13 @@
       }
       document.getElementById("total-time").textContent =
         formatTime(totalMinutesForText);
-      // CHART GRADIENT
       const ctx = document.getElementById("chart").getContext("2d");
       if (chart) chart.destroy();
+      const rgb1 = hexToRGB(color1);
+      const rgb2 = hexToRGB(color2);
       const gradient = ctx.createLinearGradient(0, 0, 0, 200);
       gradient.addColorStop(0, `rgba(${rgb1.r}, ${rgb1.g}, ${rgb1.b}, 0.4)`);
       gradient.addColorStop(1, `rgba(${rgb2.r}, ${rgb2.g}, ${rgb2.b}, 0)`);
-      // GRADIENT LINE
-      const lineGradient = ctx.createLinearGradient(0, 0, ctx.canvas.width, 0);
-      lineGradient.addColorStop(0, color1);
-      lineGradient.addColorStop(1, color2);
       chart = new Chart(ctx, {
         type: "line",
         data: {
@@ -228,14 +213,14 @@
           datasets: [{
             data,
             label: "Minutes Played",
-            borderColor: lineGradient,
+            borderColor: color1,
             backgroundColor: gradient,
+            pointBackgroundColor: color2,
+            pointBorderColor: color1,
             fill: true,
             tension: 0.4,
             pointRadius: 3,
-            pointBackgroundColor: lineGradient,
-            pointBorderColor: lineGradient,
-            borderWidth: 2
+            borderWidth: 1.5
           }]
         },
         options: {
