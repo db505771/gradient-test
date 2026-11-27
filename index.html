@@ -6,25 +6,19 @@
   <title>Playtime Tracker</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    :root {
-      --primary-color: #FFFFFF;
-      --primary-gradient: #FFFFFF;
-      --grey-color: #AAAAAA;
-      --grey-gradient: #666666;
+    body {
+      background-color: #0E0E0E;
+      color: var(--color1);
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      overflow-x: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
     }
-body {
-  background-color: #0E0E0E;
-  color: var(--primary-color);
-  font-family: 'Segoe UI', sans-serif;
-  margin: 0;
-  padding: 0;
-  text-align: center;
-  overflow-x: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
 .wrapper {
   background-color: #0E0E0E;
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -40,20 +34,20 @@ body {
 .totals h2 {
   margin: 0;
   font-size: 22px;
-  background: linear-gradient(90deg, var(--primary-color), var(--primary-gradient));
+  color: var(--color1);
+  background: var(--gradient1);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  color: var(--primary-color);
 }
 .totals p {
   margin-top: 6px;
-  font-size: 16px;
-  background: linear-gradient(90deg, var(--grey-color), var(--grey-gradient));
+  color: var(--color3);
+  background: var(--gradient2);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  color: var(--grey-color);
+  font-size: 16px;
 }
 #chart-container {
   width: 100%;
@@ -61,6 +55,14 @@ body {
 #chart {
   width: 100%;
   height: auto;
+}
+:root {
+  --color1: #FFFFFF;
+  --color2: #FFFFFF;
+  --color3: #AAAAAA;
+  --color4: #666666;
+  --gradient1: linear-gradient(to right, #FFFFFF, #FFFFFF);
+  --gradient2: linear-gradient(to right, #AAAAAA, #666666);
 }
   </style>
 </head>
@@ -77,36 +79,32 @@ body {
   <script>
     // URL COLOR CUSTOMIZATION
     function getURLColors() {
-      const parts = window.location.hash
-        .replace(/^#/, "")
-        .split("/");
-      function validateColor(value, fallback) {
-        if (!value) return fallback;
-        const color = value.startsWith("#") ? value : "#" + value;
-        return /^#[0-9A-Fa-f]{6}$/.test(color)
-          ? color.toUpperCase()
+      const parts = window.location.hash.substring(1).split("/");
+      function validColor(value, fallback) {
+        return /^#?(?:[0-9A-Fa-f]{3}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/.test(value || "")
+          ? "#" + value.replace("#", "").toUpperCase()
           : fallback;
       }
       return {
-        primary: validateColor(parts[0], "#FFFFFF"),
-        primaryGradient: validateColor(parts[1], "#FFFFFF"),
-        grey: validateColor(parts[2], "#AAAAAA"),
-        greyGradient: validateColor(parts[3], "#666666")
+        color1: validColor(parts[0], "#FFFFFF"),
+        color2: validColor(parts[1], "#FFFFFF"),
+        color3: validColor(parts[2], "#AAAAAA"),
+        color4: validColor(parts[3], "#666666")
       };
     }
     const colors = getURLColors();
-    document.documentElement.style.setProperty("--primary-color", colors.primary);
-    document.documentElement.style.setProperty("--primary-gradient", colors.primaryGradient);
-    document.documentElement.style.setProperty("--grey-color", colors.grey);
-    document.documentElement.style.setProperty("--grey-gradient", colors.greyGradient);
-    // Convert HEX to RGBA
-    function hexToRGBA(hex, alpha = 1) {
-      const value = hex.replace("#", "");
-      const r = parseInt(value.substring(0, 2), 16);
-      const g = parseInt(value.substring(2, 4), 16);
-      const b = parseInt(value.substring(4, 6), 16);
-      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-    }
+    document.documentElement.style.setProperty("--color1", colors.color1);
+    document.documentElement.style.setProperty("--color2", colors.color2);
+    document.documentElement.style.setProperty("--color3", colors.color3);
+    document.documentElement.style.setProperty("--color4", colors.color4);
+    document.documentElement.style.setProperty(
+      "--gradient1",
+      `linear-gradient(to right, ${colors.color1}, ${colors.color2})`
+    );
+    document.documentElement.style.setProperty(
+      "--gradient2",
+      `linear-gradient(to right, ${colors.color3}, ${colors.color4})`
+    );
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRo-SarpignS39lDSaIGsV13WyUJOURcyVaRP_mEqY6XfBxby9WA_XCf5AhXi8OcwHDiP4FLqBwMGKw/pub?output=csv";
     let chartMode = 0; // 0 = total, 1 = monthly, 2 = weekly
     let chart;
@@ -209,8 +207,8 @@ body {
       const ctx = document.getElementById("chart").getContext("2d");
       if (chart) chart.destroy();
       const gradient = ctx.createLinearGradient(0, 0, 0, 200);
-      gradient.addColorStop(0, hexToRGBA(colors.primary, 0.4));
-      gradient.addColorStop(1, hexToRGBA(colors.primaryGradient, 0));
+      gradient.addColorStop(0, colors.color1);
+      gradient.addColorStop(1, colors.color2);
       chart = new Chart(ctx, {
         type: "line",
         data: {
@@ -218,15 +216,13 @@ body {
           datasets: [{
             data,
             label: "Minutes Played",
-            borderColor: colors.primary,
+            borderColor: colors.color1,
             backgroundColor: gradient,
-            pointBackgroundColor: colors.primaryGradient,
-            pointBorderColor: colors.primary,
-            pointHoverBackgroundColor: colors.primaryGradient,
-            pointHoverBorderColor: colors.primary,
             fill: true,
             tension: 0.4,
             pointRadius: 3,
+            pointBackgroundColor: colors.color1,
+            pointBorderColor: colors.color2,
             borderWidth: 1.5,
           }]
         },
@@ -242,7 +238,7 @@ body {
           scales: {
             x: {
               ticks: {
-                color: colors.grey,
+                color: colors.color3,
                 font: { size: 10 }
               },
               grid: { display: false }
