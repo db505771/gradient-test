@@ -8,9 +8,11 @@ body {
 #text {
   font-size: 24px;
   font-weight: 600;
-  background: linear-gradient(90deg, var(--color1), var(--color2));
+  display: inline-block;
+  background: linear-gradient(90deg, var(--color1) 0%, var(--color2) 100%);
   -webkit-background-clip: text;
   background-clip: text;
+  -webkit-text-fill-color: transparent;
   color: transparent;
 }
 </style>
