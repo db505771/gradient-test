@@ -35,21 +35,23 @@
     .totals {
       padding: 10px 0;
     }
-    .totals h2,
-    .totals p {
+    .totals h2 {
+      margin: 0;
+      font-size: 22px;
       display: inline-block;
       background: linear-gradient(90deg, var(--color1) 0%, var(--color2) 100%);
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    .totals h2 {
-      margin: 0;
-      font-size: 22px;
-    }
     .totals p {
       margin-top: 6px;
       font-size: 16px;
+      display: inline-block;
+      background: linear-gradient(90deg, var(--color1) 0%, var(--color2) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     #chart-container {
       width: 100%;
@@ -71,7 +73,6 @@
     </div>
   </div>
   <script>
-    // URL COLORS
     const colors = location.hash.split('/').filter(Boolean);
     const color1 = /^#[0-9A-F]{6}$/i.test(colors[0] || '')
       ? colors[0] : '#FFFFFF';
@@ -194,7 +195,6 @@
         formatTime(totalMinutesForText);
       const ctx = document.getElementById("chart").getContext("2d");
       if (chart) chart.destroy();
-      // FULLY OPAQUE GRAPH GRADIENT
       const gradient = ctx.createLinearGradient(0, 0, 0, 200);
       gradient.addColorStop(0, color1);
       gradient.addColorStop(1, color2);
