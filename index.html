@@ -11,8 +11,8 @@
       --color2: #FFFFFF;
       --color3: #AAAAAA;
       --color4: #666666;
-      --gradient1: linear-gradient(to right, #FFFFFF 0%, #FFFFFF 100%);
-      --gradient2: linear-gradient(to right, #AAAAAA 0%, #666666 100%);
+      --gradient1: linear-gradient(90deg, #FFFFFF 0%, #FFFFFF 100%);
+      --gradient2: linear-gradient(90deg, #AAAAAA 0%, #666666 100%);
     }
 body {
   background-color: transparent;
@@ -47,15 +47,17 @@ body {
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 0.5px var(--color2);
 }
 .totals p {
   margin-top: 6px;
+  font-size: 16px;
   color: var(--color3);
   background: var(--gradient2);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  font-size: 16px;
+  -webkit-text-stroke: 0.5px var(--color4);
 }
 #chart-container {
   width: 100%;
@@ -99,11 +101,11 @@ body {
     document.documentElement.style.setProperty("--color4", colors.color4);
     document.documentElement.style.setProperty(
       "--gradient1",
-      `linear-gradient(to right, ${colors.color1} 0%, ${colors.color2} 100%)`
+      `linear-gradient(90deg, ${colors.color1} 0%, ${colors.color2} 100%)`
     );
     document.documentElement.style.setProperty(
       "--gradient2",
-      `linear-gradient(to right, ${colors.color3} 0%, ${colors.color4} 100%)`
+      `linear-gradient(90deg, ${colors.color3} 0%, ${colors.color4} 100%)`
     );
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRo-SarpignS39lDSaIGsV13WyUJOURcyVaRP_mEqY6XfBxby9WA_XCf5AhXi8OcwHDiP4FLqBwMGKw/pub?output=csv";
     let chartMode = 0; // 0 = total, 1 = monthly, 2 = weekly
@@ -206,7 +208,6 @@ body {
       document.getElementById("total-time").textContent = formatTime(totalMinutesForText);
       const ctx = document.getElementById("chart").getContext("2d");
       if (chart) chart.destroy();
-      // Exact primary gradient for chart fill
       const gradient = ctx.createLinearGradient(0, 0, 0, 200);
       gradient.addColorStop(0, colors.color1);
       gradient.addColorStop(1, colors.color2);
