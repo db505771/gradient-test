@@ -47,7 +47,7 @@ body {
 .totals p {
   margin-top: 6px;
   font-size: 16px;
-  color: var(--color1);
+  color: var(--color3);
 }
 .primary-gradient {
   display: inline-block;
@@ -76,7 +76,7 @@ body {
   <div class="wrapper">
     <div class="totals">
       <h2 id="chart-title"><span class="primary-gradient">Total Time</span></h2>
-      <p id="total-time"><span class="primary-gradient">Loading...</span></p>
+      <p id="total-time"><span class="secondary-gradient">Loading...</span></p>
     </div>
     <div id="chart-container">
       <canvas id="chart" height="180"></canvas>
@@ -156,9 +156,13 @@ body {
           }
         }
         const last7 = getLast7Days();
-        labels = last7.map(d => d.toLocaleDateString("default", { month: "short", day: "numeric" }));
+        labels = last7.map(d =>
+          d.toLocaleDateString("default", { month: "short", day: "numeric" })
+        );
         const dateMap = {};
-        last7.forEach(d => dateMap[d.toISOString().slice(0, 10)] = 0);
+        last7.forEach(d => {
+          dateMap[d.toISOString().slice(0, 10)] = 0;
+        });
         for (const row of rows) {
           const date = new Date(row[0]);
           const key = date.toISOString().slice(0, 10);
@@ -168,11 +172,14 @@ body {
           }
         }
         data = last7.map(d => dateMap[d.toISOString().slice(0, 10)] || 0);
-        document.getElementById("chart-title").innerHTML = '<span class="primary-gradient">Total Time</span>';
+        document.getElementById("chart-title").innerHTML =
+          '<span class="primary-gradient">Total Time</span>';
       } else if (chartMode === 1) {
         labels = getMonthLabelsUpToCurrent();
         const monthMap = {};
-        for (let i = 0; i < labels.length; i++) monthMap[i] = 0;
+        for (let i = 0; i < labels.length; i++) {
+          monthMap[i] = 0;
+        }
         for (const row of rows) {
           const date = new Date(row[0]);
           const mins = parseInt(row[4]);
@@ -185,16 +192,25 @@ body {
         for (const row of rows) {
           const d = new Date(row[0]);
           const mins = parseInt(row[4]);
-          if (!isNaN(mins) && d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()) {
+          if (
+            !isNaN(mins) &&
+            d.getFullYear() === now.getFullYear() &&
+            d.getMonth() === now.getMonth()
+          ) {
             totalMinutesForText += mins;
           }
         }
-        document.getElementById("chart-title").innerHTML = '<span class="primary-gradient">Monthly Playtime</span>';
+        document.getElementById("chart-title").innerHTML =
+          '<span class="primary-gradient">Monthly Playtime</span>';
       } else if (chartMode === 2) {
         const last7 = getLast7Days();
-        labels = last7.map(d => d.toLocaleDateString("default", { month: "short", day: "numeric" }));
+        labels = last7.map(d =>
+          d.toLocaleDateString("default", { month: "short", day: "numeric" })
+        );
         const dateMap = {};
-        last7.forEach(d => dateMap[d.toISOString().slice(0, 10)] = 0);
+        last7.forEach(d => {
+          dateMap[d.toISOString().slice(0, 10)] = 0;
+        });
         for (const row of rows) {
           const date = new Date(row[0]);
           const key = date.toISOString().slice(0, 10);
@@ -205,15 +221,24 @@ body {
         }
         data = last7.map(d => dateMap[d.toISOString().slice(0, 10)] || 0);
         totalMinutesForText = data.reduce((a, b) => a + b, 0);
-        document.getElementById("chart-title").innerHTML = '<span class="primary-gradient">Weekly Time</span>';
+        document.getElementById("chart-title").innerHTML =
+          '<span class="primary-gradient">Weekly Time</span>';
       }
+      // Playtime amount always uses colors 3 and 4.
       document.getElementById("total-time").innerHTML =
-        `<span class="primary-gradient">${formatTime(totalMinutesForText)}</span>`;
+        `<span class="secondary-gradient">${formatTime(totalMinutesForText)}</span>`;
       const ctx = document.getElementById("chart").getContext("2d");
       if (chart) chart.destroy();
+      // Primary gradient for the chart.
       const gradient = ctx.createLinearGradient(0, 0, 0, 200);
       gradient.addColorStop(0, colors.color1);
       gradient.addColorStop(1, colors.color2);
+      // Secondary gradient for grey chart labels.
+      const secondaryChartGradient = ctx.createLinearGradient(
+        0, 0, ctx.canvas.width, 0
+      );
+      secondaryChartGradient.addColorStop(0, colors.color3);
+      secondaryChartGradient.addColorStop(1, colors.color4);
       chart = new Chart(ctx, {
         type: "line",
         data: {
@@ -243,7 +268,7 @@ body {
           scales: {
             x: {
               ticks: {
-                color: colors.color3,
+                color: secondaryChartGradient,
                 font: { size: 10 }
               },
               grid: { display: false }
